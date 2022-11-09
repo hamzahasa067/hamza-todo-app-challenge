@@ -1,19 +1,27 @@
-import express, { Express, Request, Response } from 'express';
-import dotenv from 'dotenv';
-import connections from './utils/database';
-dotenv.config();
+import express, { Express, NextFunction, Request, Response } from "express"
+import cookieParser from "cookie-parser"
+import dotenv from "dotenv"
+import connections from "./utils/database"
+import { ErrorHandler } from "./utils/errorHandlers"
 
-const app: Express = express();
-const port = process.env.PORT;
+import usersRouter from "./routes/users";
+dotenv.config()
 
-app.get('/', async (req: Request, res: Response) => {
-  const queryRes = await connections.query("SELECT * FROM users");
-  // console.log(queryRes);
+const app: Express = express()
+const port = process.env.PORT
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
+app.use(cookieParser())
 
-  res.send("good");
-  
-});
+app.use("/users",usersRouter )
+
+app.use(
+  (err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
+    console.error(err)
+    res.status(err.code).json(err)
+  }
+)
 
 app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running on port:${port}`);
-});
+  console.log(`⚡️[server]: Server is running on port:${port}`)
+})

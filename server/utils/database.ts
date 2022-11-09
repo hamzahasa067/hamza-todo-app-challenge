@@ -4,7 +4,6 @@ import mysql from 'mysql2';
 
 dotenv.config();
 // Create the connection pool. The pool-specific settings are the defaults
-console.log(process.env.DATABASE_URL,process.env.DATABASE_USERNAME);
 
 const pool = mysql.createPool({
   host: process.env.DATABASE_URL,
