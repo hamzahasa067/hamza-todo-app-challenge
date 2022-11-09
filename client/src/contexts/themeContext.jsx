@@ -1,12 +1,18 @@
 import React from "react"
 
-export const ThemeContext = React.createContext("dark")
+export const ThemeContext = React.createContext("light")
 export const ToggleThemeContext = React.createContext()
 
 export default function ThemeContextProvider({ children }) {
-  const [theme, setTheme] = React.useState("dark")
+  const localStorageData = localStorage.getItem("theme")
+
+  const [theme, setTheme] = React.useState(
+    !localStorageData ? "light" : JSON.parse(localStorageData)
+  )
   function toggleTheme() {
-    setTheme(theme === "light" ? "dark" : "light")
+    const newTheme = theme === "light" ? "dark" : "light"
+    localStorage.setItem("theme", JSON.stringify(newTheme))
+    setTheme(newTheme)
   }
   return (
     <ThemeContext.Provider value={theme}>
