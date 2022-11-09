@@ -82,16 +82,25 @@ nav {
   border: none !important;
 }
 .Todos .todo-item {
-  cursor: pointer;
+  width: 100%;
+  /* cursor: pointer; */
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   padding: 1.5rem 2rem;
   font-size: 1.4rem;
   outline: none;
   border: none;
-
   width: 100%;
+}
+.todo-item .todo-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.todo-item .delete-todo {
+  cursor: pointer;
+  opacity: 0;
 }
 .App.light .Todos .todo-item {
   border-bottom: 1px solid hsl(235, 21%, 11%);
@@ -128,6 +137,9 @@ nav {
   border-radius: 50em;
   border: 2px solid transparent;
 }
+.todo-item:hover .delete-todo {
+  opacity: 1;
+}
 .App.light .todo-item:hover .todo-checker {
   background: linear-gradient(white, white) padding-box,
     linear-gradient(hsl(192, 100%, 67%), hsl(280, 87%, 65%)) border-box;
@@ -160,8 +172,8 @@ input.todo-item {
   cursor: text !important;
 }
 .theme-toggler {
-    cursor: pointer;
+  cursor: pointer;
 }
 .todos-footer {
-    border: none !important;
+  border: none !important;
 }

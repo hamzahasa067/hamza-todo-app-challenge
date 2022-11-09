@@ -1,14 +1,19 @@
-import React, { useState } from "react"
+import React, { useContext, useState } from "react"
 import Input from "../Input"
-
-export default function AddTodo({}) {
+import { TodosContext, UpdateTodosContext } from "../../contexts/todosContext"
+export default function AddTodo() {
+  const todos = useContext(TodosContext)
+  const updateTodos = useContext(UpdateTodosContext)
+  console.log(todos, updateTodos)
   const [todoValue, setTodoValue] = useState("")
   const handleFromSubmit = (e) => {
     e.preventDefault()
-    console.log(todoValue)
+    setTodoValue("")
+    updateTodos([{ text: todoValue, isDone: false }, ...todos])
   }
   const handleChange = (e) => {
     setTodoValue(e.target.value)
+    console.log(todoValue)
   }
   return (
     <form onSubmit={handleFromSubmit}>

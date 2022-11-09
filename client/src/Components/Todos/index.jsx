@@ -1,15 +1,18 @@
-import React from "react"
+import React, { useState } from "react"
+import TodosContextProvider from "../../contexts/todosContext"
 import AddTodo from "./AddTodo"
 import TodoList from "./TodoList"
 import TodosFooter from "./TodosFooter"
-export default function index() {
+export default function Index() {
   return (
-    <div className="Todos container">
-      <AddTodo />
-      <ul className="todos-list">
-        <TodoList />
-        <TodosFooter />
-      </ul>
-    </div>
+    <TodosContextProvider>
+      <div className="Todos container">
+        <AddTodo />
+        <ul className="todos-list">
+          <TodoList />
+          <TodosFooter />
+        </ul>
+      </div>
+    </TodosContextProvider>
   )
 }
