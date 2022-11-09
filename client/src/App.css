@@ -90,15 +90,25 @@ nav {
   font-size: 1.4rem;
   outline: none;
   border: none;
-  border-bottom: 1px solid white;
+
   width: 100%;
 }
+.App.light .Todos .todo-item {
+  border-bottom: 1px solid hsl(235, 21%, 11%);
+}
+.App.dark .Todos .todo-item {
+  border-bottom: 1px solid white;
+}
+
 .Todos .todo-item.todos-footer {
   font-size: 1rem;
   border-bottom: none;
 }
 .App.dark .todo-item {
   background-color: hsl(235, 24%, 19%);
+}
+.App.light .todo-item {
+  background-color: white;
 }
 .todo-checker {
   display: flex;
@@ -111,7 +121,6 @@ nav {
   border: 2px solid gray;
   cursor: pointer;
 }
-
 .App.dark .todo-item:hover .todo-checker {
   background: linear-gradient(hsl(235, 24%, 19%), hsl(235, 24%, 19%))
       padding-box,
@@ -148,5 +157,11 @@ nav {
   opacity: 1;
 }
 input.todo-item {
-    cursor: text !important;
+  cursor: text !important;
+}
+.theme-toggler {
+    cursor: pointer;
+}
+.todos-footer {
+    border: none !important;
 }
