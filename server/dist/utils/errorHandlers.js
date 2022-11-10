@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ServerError = exports.AuthError = exports.ErrorHandler = void 0;
+exports.ServerError = exports.NotFoundError = exports.AuthError = exports.ErrorHandler = void 0;
 class ErrorHandler extends Error {
     constructor(message, code) {
         super(message);
@@ -15,6 +15,12 @@ class AuthError extends ErrorHandler {
     }
 }
 exports.AuthError = AuthError;
+class NotFoundError extends ErrorHandler {
+    constructor(message) {
+        super(message, 400);
+    }
+}
+exports.NotFoundError = NotFoundError;
 class ServerError extends ErrorHandler {
     constructor(message) {
         super("Server Error: " + message, 500);

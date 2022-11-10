@@ -1,37 +1,54 @@
-import { Express, NextFunction, Request, Response } from "express"
-import validator from "validator"
+import { NextFunction, Request, Response } from "express"
 import connections from "../utils/database"
-import { AuthError, IFiledErrors } from "../utils/errorHandlers"
-import bcrypt from "bcrypt"
+import { AuthError, NotFoundError, ServerError } from "../utils/errorHandlers"
+import { SuccessResponse } from "../utils/successResponse"
+import { IUser } from "../interfaces/user"
+import { createToken, maxAge } from "../utils/jwt"
 export const handleSignUp = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const { email, name, password } = req.body
-  const errors: IFiledErrors = {}
   try {
-    if (!validator.isEmail(email))
-      throw (errors.email = "The email you entered is invalid")
-    if (password < 6)
-      throw (errors.password =
-        "The password you entered is invalid , password must be minimum than 6 characters")
-    if (name?.length < 6)
-      throw (errors.password =
-        "The name you entered is invalid, name must be minimum than 6 characters")
-    if (errors.email || errors.name || errors.password)
-      throw new AuthError("", errors)
-
-    const salt = await bcrypt.genSalt()
-    const encrypted_password = await bcrypt.hash(password, salt)
-    const result = await connections.query(
+    if (!req.user?.name || !req.user?.email || !req.user?.encrypted_password)
+      throw new ServerError("No user was provied by the middleware")
+    const [info, data] = await connections.query(
       "INSERT INTO users(name,email,encrypted_password) VALUES(?,?,?)",
-      [name, email, encrypted_password]
+      [req.user.name, req.user.email, req.user.encrypted_password]
+    )
+    if (!req.user) throw new ServerError("User was not created! ")
+
+    const createdUser: IUser = {
+      ...req.user,
+      id: info.insertId,
+    }
+
+    const token = createToken(createdUser.id)
+
+    res.json(new SuccessResponse({user:createdUser,token }))
+  } catch (error: unknown) {
+    next(error)
+  }
+}
+export const handleDelete = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { userId } = req.params
+
+  try {
+    
+    if( req.user_id !== Number(userId)) throw new AuthError("No authorized to do this operation")
+    const [info, data] = await connections.query(
+      "DELETE FROM users WHERE users.id = ?",
+      [Number(userId)]
     )
 
-    res.json(result)
+    if (info.affectedRows < 1)
+      throw new NotFoundError("No user(s) with this id: " + userId)
+    res.json(new SuccessResponse())
   } catch (error: unknown) {
-    console.error(error)
     next(error)
   }
 }

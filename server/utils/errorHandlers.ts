@@ -1,7 +1,7 @@
 export interface IFiledErrors {
   email?: string
   password?: string
-  name?:string;
+  name?: string
 }
 
 export class ErrorHandler extends Error {
@@ -10,8 +10,13 @@ export class ErrorHandler extends Error {
   }
 }
 export class AuthError extends ErrorHandler {
-  constructor(message: string, public filedErrors: IFiledErrors) {
+  constructor(message: string, public filedErrors?: IFiledErrors) {
     super("Error while authentication: " + message, 400)
+  }
+}
+export class NotFoundError extends ErrorHandler {
+  constructor(message: string) {
+    super(message, 400)
   }
 }
 export class ServerError extends ErrorHandler {

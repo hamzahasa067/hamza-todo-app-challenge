@@ -12,33 +12,40 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleSignUp = void 0;
-const validator_1 = __importDefault(require("validator"));
+exports.handleDelete = exports.handleSignUp = void 0;
 const database_1 = __importDefault(require("../utils/database"));
 const errorHandlers_1 = require("../utils/errorHandlers");
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const successResponse_1 = require("../utils/successResponse");
+const jwt_1 = require("../utils/jwt");
 const handleSignUp = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, name, password } = req.body;
-    const errors = {};
+    var _a, _b, _c;
     try {
-        if (!validator_1.default.isEmail(email))
-            throw (errors.email = "The email you entered is invalid");
-        if (password < 6)
-            throw (errors.password =
-                "The password you entered is invalid , password must be minimum than 6 characters");
-        if ((name === null || name === void 0 ? void 0 : name.length) < 6)
-            throw (errors.password =
-                "The name you entered is invalid, name must be minimum than 6 characters");
-        if (errors.email || errors.name || errors.password)
-            throw new errorHandlers_1.AuthError("", errors);
-        const salt = yield bcrypt_1.default.genSalt();
-        const encrypted_password = yield bcrypt_1.default.hash(password, salt);
-        const result = yield database_1.default.query("INSERT INTO users(name,email,encrypted_password) VALUES(?,?,?)", [name, email, encrypted_password]);
-        res.json(result);
+        if (!((_a = req.user) === null || _a === void 0 ? void 0 : _a.name) || !((_b = req.user) === null || _b === void 0 ? void 0 : _b.email) || !((_c = req.user) === null || _c === void 0 ? void 0 : _c.encrypted_password))
+            throw new errorHandlers_1.ServerError("No user was provied by the middleware");
+        const [info, data] = yield database_1.default.query("INSERT INTO users(name,email,encrypted_password) VALUES(?,?,?)", [req.user.name, req.user.email, req.user.encrypted_password]);
+        if (!req.user)
+            throw new errorHandlers_1.ServerError("User was not created! ");
+        const createdUser = Object.assign(Object.assign({}, req.user), { id: info.insertId });
+        const token = (0, jwt_1.createToken)(createdUser.id);
+        res.json(new successResponse_1.SuccessResponse({ user: createdUser, token }));
     }
     catch (error) {
-        console.error(error);
         next(error);
     }
 });
 exports.handleSignUp = handleSignUp;
+const handleDelete = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId } = req.params;
+    try {
+        if (req.user_id !== Number(userId))
+            throw new errorHandlers_1.AuthError("No authorized to do this operation");
+        const [info, data] = yield database_1.default.query("DELETE FROM users WHERE users.id = ?", [Number(userId)]);
+        if (info.affectedRows < 1)
+            throw new errorHandlers_1.NotFoundError("No user(s) with this id: " + userId);
+        res.json(new successResponse_1.SuccessResponse());
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.handleDelete = handleDelete;
